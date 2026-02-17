@@ -2,19 +2,20 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { DATABASE_CONFIG } from '@config/database.config';
-import { StudentOrmEntity } from './database';
-import { StudentRepository } from './repositories';
+import { UserOrmEntity } from './database';
+import { UserRepository } from './repositories';
+import { IUserRepository } from '@domain/core';
 
-const REPOSITORIES = [StudentRepository];
+const REPOSITORIES = [UserRepository];
 
 const PROVIDERS = [
   {
-    provide: 'IStudentRepository',
-    useClass: StudentRepository,
+    provide: IUserRepository,
+    useClass: UserRepository,
   },
 ];
 
-const PORT_TOKENS = ['IStudentRepository'];
+const PORT_TOKENS = [IUserRepository];
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ const PORT_TOKENS = ['IStudentRepository'];
       inject: [DATABASE_CONFIG.KEY],
       useFactory: (dbConfig) => dbConfig,
     }),
-    TypeOrmModule.forFeature([StudentOrmEntity]),
+    TypeOrmModule.forFeature([UserOrmEntity]),
   ],
   providers: [...REPOSITORIES, ...PROVIDERS],
   exports: [...PORT_TOKENS],

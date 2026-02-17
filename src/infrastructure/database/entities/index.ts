@@ -1,1 +1,1 @@
-export * from './student.orm-entity';
+export * from './user.orm-entity';

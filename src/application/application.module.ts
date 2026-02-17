@@ -1,12 +1,14 @@
 import { Module } from '@nestjs/common';
+import { JwtModule } from '@nestjs/jwt';
 import { InfrastructureModule } from '@infrastructure/infrastructure.module';
-import { CreateStudentUseCase, GetStudentsUseCase } from './services';
+import { jwtConfig } from '@config/jwt.config';
+import { AuthService } from './services';
 
-const SERVICES = [GetStudentsUseCase, CreateStudentUseCase];
+const SERVICES = [AuthService];
 
 @Module({
-  imports: [InfrastructureModule],
+  imports: [InfrastructureModule, JwtModule.registerAsync(jwtConfig)],
   providers: [...SERVICES],
-  exports: [...SERVICES, InfrastructureModule],
+  exports: [...SERVICES, InfrastructureModule, JwtModule],
 })
 export class ApplicationModule {}

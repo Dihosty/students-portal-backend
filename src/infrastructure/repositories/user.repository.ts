@@ -1,0 +1,80 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { IUserRepository } from '../../domain/core/interfaces/user.repository';
+import { User } from '../../domain/entities/user.entity';
+import { UserOrmEntity } from '../database/entities/user.orm-entity';
+
+@Injectable()
+export class UserRepository implements IUserRepository {
+  constructor(
+    @InjectRepository(UserOrmEntity)
+    private readonly userOrmRepository: Repository<UserOrmEntity>,
+  ) {}
+
+  async findById(id: string): Promise<User | null> {
+    const userOrm = await this.userOrmRepository.findOne({ where: { id } });
+    return userOrm ? this.toDomain(userOrm) : null;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const userOrm = await this.userOrmRepository.findOne({ where: { email } });
+    return userOrm ? this.toDomain(userOrm) : null;
+  }
+
+  async create(user: User): Promise<User> {
+    const userOrm = this.toOrm(user);
+    const savedUser = await this.userOrmRepository.save(userOrm);
+    return this.toDomain(savedUser);
+  }
+
+  async update(id: string, user: Partial<User>): Promise<User> {
+    await this.userOrmRepository.update(id, this.toOrm(user as User));
+    const updatedUser = await this.userOrmRepository.findOne({ where: { id } });
+    if (!updatedUser) {
+      throw new Error('User not found');
+    }
+    return this.toDomain(updatedUser);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.userOrmRepository.delete(id);
+  }
+
+  async findAll(): Promise<User[]> {
+    const users = await this.userOrmRepository.find();
+    return users.map((user) => this.toDomain(user));
+  }
+
+  private toDomain(userOrm: UserOrmEntity): User {
+    return new User(
+      userOrm.id,
+      userOrm.email,
+      userOrm.password,
+      userOrm.firstName,
+      userOrm.lastName,
+      userOrm.role,
+      userOrm.isActive,
+      userOrm.groupId,
+      userOrm.courseYear,
+      userOrm.faculty,
+      userOrm.createdAt,
+      userOrm.updatedAt,
+    );
+  }
+
+  private toOrm(user: User): Partial<UserOrmEntity> {
+    const userOrm = new UserOrmEntity();
+    if (user.id) userOrm.id = user.id;
+    userOrm.email = user.email;
+    userOrm.password = user.password;
+    userOrm.firstName = user.firstName;
+    userOrm.lastName = user.lastName;
+    userOrm.role = user.role;
+    userOrm.isActive = user.isActive;
+    if (user.groupId !== undefined) userOrm.groupId = user.groupId;
+    if (user.courseYear !== undefined) userOrm.courseYear = user.courseYear;
+    if (user.faculty !== undefined) userOrm.faculty = user.faculty;
+    return userOrm;
+  }
+}
