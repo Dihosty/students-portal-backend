@@ -110,7 +110,22 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    await this.userRepository.update(userId, updateProfileDto);
+    const updatedUser = new User(
+      user.id,
+      user.email,
+      user.password,
+      updateProfileDto.firstName ?? user.firstName,
+      updateProfileDto.lastName ?? user.lastName,
+      user.role,
+      user.isActive,
+      updateProfileDto.groupId ?? user.groupId,
+      updateProfileDto.courseYear ?? user.courseYear,
+      updateProfileDto.faculty ?? user.faculty,
+      user.createdAt,
+      user.updatedAt,
+    );
+
+    await this.userRepository.update(userId, updatedUser);
     return this.getProfile(userId);
   }
 
@@ -132,7 +147,23 @@ export class AuthService {
     }
 
     const hashedPassword = await bcrypt.hash(changePasswordDto.newPassword, 10);
-    await this.userRepository.update(userId, { password: hashedPassword });
+
+    const updatedUser = new User(
+      user.id,
+      user.email,
+      hashedPassword,
+      user.firstName,
+      user.lastName,
+      user.role,
+      user.isActive,
+      user.groupId,
+      user.courseYear,
+      user.faculty,
+      user.createdAt,
+      user.updatedAt,
+    );
+
+    await this.userRepository.update(userId, updatedUser);
 
     return { message: 'Password changed successfully' };
   }
