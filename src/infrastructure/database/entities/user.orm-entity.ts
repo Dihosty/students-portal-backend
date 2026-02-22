@@ -5,7 +5,10 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
+import { GroupOrmEntity } from './group.orm-entity';
 
 @Entity('users')
 export class UserOrmEntity {
@@ -36,6 +39,10 @@ export class UserOrmEntity {
 
   @Column({ name: 'group_id', nullable: true })
   groupId?: string;
+
+  @ManyToOne(() => GroupOrmEntity, (group) => group.students)
+  @JoinColumn({ name: 'group_id' })
+  group?: GroupOrmEntity;
 
   @Column({ name: 'course_year', nullable: true })
   courseYear?: number;

@@ -18,7 +18,7 @@ export class GroupOrmEntity {
   @Column({ name: 'course_year' })
   courseYear: number;
 
-  @OneToMany(() => UserOrmEntity, (user) => user.groupId)
+  @OneToMany(() => UserOrmEntity, (user) => user.group)
   students: UserOrmEntity[];
 
   @CreateDateColumn({ name: 'created_at' })
