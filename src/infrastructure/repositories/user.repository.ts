@@ -9,28 +9,30 @@ import { UserOrmEntity } from '../database/entities/user.orm-entity';
 export class UserRepository implements IUserRepository {
   constructor(
     @InjectRepository(UserOrmEntity)
-    private readonly userOrmRepository: Repository<UserOrmEntity>,
+    private readonly repository: Repository<UserOrmEntity>,
   ) {}
 
   async findById(id: string): Promise<User | null> {
-    const userOrm = await this.userOrmRepository.findOne({ where: { id } });
+    const userOrm = await this.repository.findOne({ where: { id } });
     return userOrm ? this.toDomain(userOrm) : null;
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    const userOrm = await this.userOrmRepository.findOne({ where: { email } });
+    const userOrm = await this.repository.findOne({ where: { email } });
     return userOrm ? this.toDomain(userOrm) : null;
   }
 
   async create(user: User): Promise<User> {
     const userOrm = this.toOrm(user);
-    const savedUser = await this.userOrmRepository.save(userOrm);
+    const savedUser = await this.repository.save(userOrm);
     return this.toDomain(savedUser);
   }
 
   async update(id: string, user: Partial<User>): Promise<User> {
-    await this.userOrmRepository.update(id, this.toOrm(user as User));
-    const updatedUser = await this.userOrmRepository.findOne({ where: { id } });
+    const ormEntity = this.toOrm(user);
+    const { id: _, ...updatePayload } = ormEntity;
+    await this.repository.update(id, updatePayload);
+    const updatedUser = await this.repository.findOne({ where: { id } });
     if (!updatedUser) {
       throw new Error('User not found');
     }
@@ -38,11 +40,11 @@ export class UserRepository implements IUserRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.userOrmRepository.delete(id);
+    await this.repository.delete(id);
   }
 
   async findAll(): Promise<User[]> {
-    const users = await this.userOrmRepository.find();
+    const users = await this.repository.find();
     return users.map((user) => this.toDomain(user));
   }
 
@@ -63,15 +65,15 @@ export class UserRepository implements IUserRepository {
     );
   }
 
-  private toOrm(user: User): Partial<UserOrmEntity> {
-    const userOrm = new UserOrmEntity();
-    if (user.id) userOrm.id = user.id;
-    userOrm.email = user.email;
-    userOrm.password = user.password;
-    userOrm.firstName = user.firstName;
-    userOrm.lastName = user.lastName;
-    userOrm.role = user.role;
-    userOrm.isActive = user.isActive;
+  private toOrm(user: Partial<User>): Partial<UserOrmEntity> {
+    const userOrm: Partial<UserOrmEntity> = {};
+    if (user.id !== undefined) userOrm.id = user.id;
+    if (user.email !== undefined) userOrm.email = user.email;
+    if (user.password !== undefined) userOrm.password = user.password;
+    if (user.firstName !== undefined) userOrm.firstName = user.firstName;
+    if (user.lastName !== undefined) userOrm.lastName = user.lastName;
+    if (user.role !== undefined) userOrm.role = user.role;
+    if (user.isActive !== undefined) userOrm.isActive = user.isActive;
     if (user.groupId !== undefined) userOrm.groupId = user.groupId;
     if (user.courseYear !== undefined) userOrm.courseYear = user.courseYear;
     if (user.faculty !== undefined) userOrm.faculty = user.faculty;

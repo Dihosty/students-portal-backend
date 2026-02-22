@@ -1,11 +1,14 @@
+import { UserRole } from '@domain/core';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-import { UserRole } from '../../../domain/core/enums/user-role.enum';
+import { GroupOrmEntity } from './group.orm-entity';
 
 @Entity('users')
 export class UserOrmEntity {
@@ -36,6 +39,10 @@ export class UserOrmEntity {
 
   @Column({ name: 'group_id', nullable: true })
   groupId?: string;
+
+  @ManyToOne(() => GroupOrmEntity, (group) => group.students)
+  @JoinColumn({ name: 'group_id' })
+  group?: GroupOrmEntity;
 
   @Column({ name: 'course_year', nullable: true })
   courseYear?: number;
