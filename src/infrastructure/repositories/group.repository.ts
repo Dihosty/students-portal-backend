@@ -55,11 +55,11 @@ export class GroupRepository implements IGroupRepository {
     );
   }
 
-  private toOrm(group: Group): GroupOrmEntity {
-    const groupOrm = new GroupOrmEntity();
-    if (group.id) groupOrm.id = group.id;
-    groupOrm.name = group.name;
-    groupOrm.courseYear = group.courseYear;
+  private toOrm(group: Partial<Group>): Partial<GroupOrmEntity> {
+    const groupOrm: Partial<GroupOrmEntity> = {};
+    if (group.id !== undefined) groupOrm.id = group.id;
+    if (group.name !== undefined) groupOrm.name = group.name;
+    if (group.courseYear !== undefined) groupOrm.courseYear = group.courseYear;
     return groupOrm;
   }
 }

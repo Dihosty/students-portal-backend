@@ -7,7 +7,8 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { UserOrmEntity, SubjectOrmEntity } from './index';
+import { UserOrmEntity } from './user.orm-entity';
+import { SubjectOrmEntity } from './subject.orm-entity';
 
 @Entity('teachers')
 export class TeacherOrmEntity {

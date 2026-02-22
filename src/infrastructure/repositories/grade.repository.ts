@@ -80,15 +80,15 @@ export class GradeRepository implements IGradeRepository {
     );
   }
 
-  private toOrm(grade: Grade): GradeOrmEntity {
-    const gradeOrm = new GradeOrmEntity();
-    if (grade.id) gradeOrm.id = grade.id;
-    gradeOrm.studentId = grade.studentId;
-    gradeOrm.subjectId = grade.subjectId;
-    gradeOrm.teacherId = grade.teacherId;
-    gradeOrm.score = grade.score;
-    gradeOrm.type = grade.type;
-    gradeOrm.date = grade.date;
+  private toOrm(grade: Partial<Grade>): Partial<GradeOrmEntity> {
+    const gradeOrm: Partial<GradeOrmEntity> = {};
+    if (grade.id !== undefined) gradeOrm.id = grade.id;
+    if (grade.studentId !== undefined) gradeOrm.studentId = grade.studentId;
+    if (grade.subjectId !== undefined) gradeOrm.subjectId = grade.subjectId;
+    if (grade.teacherId !== undefined) gradeOrm.teacherId = grade.teacherId;
+    if (grade.score !== undefined) gradeOrm.score = grade.score;
+    if (grade.type !== undefined) gradeOrm.type = grade.type;
+    if (grade.date !== undefined) gradeOrm.date = grade.date;
     return gradeOrm;
   }
 }

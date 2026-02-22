@@ -55,11 +55,12 @@ export class SubjectRepository implements ISubjectRepository {
     );
   }
 
-  private toOrm(subject: Subject): SubjectOrmEntity {
-    const subjectOrm = new SubjectOrmEntity();
-    if (subject.id) subjectOrm.id = subject.id;
-    subjectOrm.name = subject.name;
-    subjectOrm.teacherId = subject.teacherId;
+  private toOrm(subject: Partial<Subject>): Partial<SubjectOrmEntity> {
+    const subjectOrm: Partial<SubjectOrmEntity> = {};
+    if (subject.id !== undefined) subjectOrm.id = subject.id;
+    if (subject.name !== undefined) subjectOrm.name = subject.name;
+    if (subject.teacherId !== undefined)
+      subjectOrm.teacherId = subject.teacherId;
     return subjectOrm;
   }
 }

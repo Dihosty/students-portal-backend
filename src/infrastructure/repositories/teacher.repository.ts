@@ -55,11 +55,11 @@ export class TeacherRepository implements ITeacherRepository {
     );
   }
 
-  private toOrm(teacher: Teacher): TeacherOrmEntity {
-    const teacherOrm = new TeacherOrmEntity();
-    if (teacher.id) teacherOrm.id = teacher.id;
-    teacherOrm.userId = teacher.userId;
-    teacherOrm.faculty = teacher.faculty;
+  private toOrm(teacher: Partial<Teacher>): Partial<TeacherOrmEntity> {
+    const teacherOrm: Partial<TeacherOrmEntity> = {};
+    if (teacher.id !== undefined) teacherOrm.id = teacher.id;
+    if (teacher.userId !== undefined) teacherOrm.userId = teacher.userId;
+    if (teacher.faculty !== undefined) teacherOrm.faculty = teacher.faculty;
     return teacherOrm;
   }
 }

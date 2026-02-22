@@ -1,3 +1,4 @@
+import { UserRole } from '@domain/core';
 import {
   Entity,
   Column,
@@ -5,7 +6,6 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { UserRole } from '../../../domain/core/enums/user-role.enum';
 
 @Entity('users')
 export class UserOrmEntity {

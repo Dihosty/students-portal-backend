@@ -8,7 +8,9 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { SubjectOrmEntity, TeacherOrmEntity, UserOrmEntity } from './index';
+import { SubjectOrmEntity } from './subject.orm-entity';
+import { TeacherOrmEntity } from './teacher.orm-entity';
+import { UserOrmEntity } from './user.orm-entity';
 
 @Entity('grades')
 export class GradeOrmEntity {

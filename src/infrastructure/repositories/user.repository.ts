@@ -28,8 +28,10 @@ export class UserRepository implements IUserRepository {
     return this.toDomain(savedUser);
   }
 
-  async update(id: string, user: User): Promise<User> {
-    await this.repository.update(id, this.toOrm(user));
+  async update(id: string, user: Partial<User>): Promise<User> {
+    const ormEntity = this.toOrm(user);
+    const { id: _, ...updatePayload } = ormEntity;
+    await this.repository.update(id, updatePayload);
     const updatedUser = await this.repository.findOne({ where: { id } });
     if (!updatedUser) {
       throw new Error('User not found');
@@ -63,15 +65,15 @@ export class UserRepository implements IUserRepository {
     );
   }
 
-  private toOrm(user: User): UserOrmEntity {
-    const userOrm = new UserOrmEntity();
-    if (user.id) userOrm.id = user.id;
-    userOrm.email = user.email;
-    userOrm.password = user.password;
-    userOrm.firstName = user.firstName;
-    userOrm.lastName = user.lastName;
-    userOrm.role = user.role;
-    userOrm.isActive = user.isActive;
+  private toOrm(user: Partial<User>): Partial<UserOrmEntity> {
+    const userOrm: Partial<UserOrmEntity> = {};
+    if (user.id !== undefined) userOrm.id = user.id;
+    if (user.email !== undefined) userOrm.email = user.email;
+    if (user.password !== undefined) userOrm.password = user.password;
+    if (user.firstName !== undefined) userOrm.firstName = user.firstName;
+    if (user.lastName !== undefined) userOrm.lastName = user.lastName;
+    if (user.role !== undefined) userOrm.role = user.role;
+    if (user.isActive !== undefined) userOrm.isActive = user.isActive;
     if (user.groupId !== undefined) userOrm.groupId = user.groupId;
     if (user.courseYear !== undefined) userOrm.courseYear = user.courseYear;
     if (user.faculty !== undefined) userOrm.faculty = user.faculty;
