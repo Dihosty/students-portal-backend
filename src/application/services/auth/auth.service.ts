@@ -6,6 +6,7 @@ import {
   UpdateProfileDto,
   ChangePasswordDto,
   UserProfileDto,
+  UserRole,
 } from '@domain/core';
 import { User } from '@domain/entities';
 import {
@@ -43,7 +44,7 @@ export class AuthService {
       hashedPassword,
       registerDto.firstName,
       registerDto.lastName,
-      registerDto.role,
+      UserRole.STUDENT,
       true,
       registerDto.groupId,
       registerDto.courseYear,

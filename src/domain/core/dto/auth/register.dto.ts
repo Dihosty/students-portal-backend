@@ -1,6 +1,5 @@
 import {
   IsEmail,
-  IsEnum,
   IsNotEmpty,
   IsString,
   MinLength,
@@ -10,11 +9,14 @@ import {
   Max,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from '../../enums/user-role.enum';
 
+/**
+ * Public registration DTO - creates STUDENT accounts only
+ * For creating ADMIN or TEACHER accounts, use POST /users endpoint (admin-only)
+ */
 export class RegisterDto {
   @ApiProperty({
-    description: 'User email address',
+    description: 'Student email address',
     example: 'student@university.edu',
   })
   @IsEmail({}, { message: 'Invalid email format' })
@@ -22,7 +24,7 @@ export class RegisterDto {
   email: string;
 
   @ApiProperty({
-    description: 'User password',
+    description: 'Password (minimum 6 characters)',
     example: 'SecurePassword123',
     minLength: 6,
   })
@@ -32,7 +34,7 @@ export class RegisterDto {
   password: string;
 
   @ApiProperty({
-    description: "User's first name",
+    description: "Student's first name",
     example: 'Max',
   })
   @IsString({ message: 'First name must be a string' })
@@ -40,21 +42,12 @@ export class RegisterDto {
   firstName: string;
 
   @ApiProperty({
-    description: "User's last name",
+    description: "Student's last name",
     example: 'Verstappen',
   })
   @IsString({ message: 'Last name must be a string' })
   @IsNotEmpty({ message: 'Last name is required' })
   lastName: string;
-
-  @ApiProperty({
-    description: 'User role',
-    enum: UserRole,
-    example: UserRole.STUDENT,
-  })
-  @IsEnum(UserRole, { message: 'Invalid user role' })
-  @IsNotEmpty({ message: 'Role is required' })
-  role: UserRole;
 
   @ApiPropertyOptional({
     description: 'Group ID (for students)',
@@ -77,7 +70,7 @@ export class RegisterDto {
   courseYear?: number;
 
   @ApiPropertyOptional({
-    description: 'Faculty (for teachers)',
+    description: "Student's faculty",
     example: 'Software Engineering',
   })
   @IsOptional()

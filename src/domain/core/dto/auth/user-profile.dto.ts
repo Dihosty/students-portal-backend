@@ -1,5 +1,5 @@
+import { UserRole } from '@domain/core/enums';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from '../../enums/user-role.enum';
 
 export class UserProfileDto {
   @ApiProperty({
@@ -40,19 +40,19 @@ export class UserProfileDto {
   role: UserRole;
 
   @ApiPropertyOptional({
-    description: 'Group ID (for students)',
+    description: 'Group ID (required for STUDENT role)',
     example: 'uuid-group-id',
   })
   groupId?: string;
 
   @ApiPropertyOptional({
-    description: 'Course year (for students)',
+    description: 'Course year 1-4 (required for STUDENT role)',
     example: 2,
   })
   courseYear?: number;
 
   @ApiPropertyOptional({
-    description: 'Faculty name (for teachers)',
+    description: 'Faculty name (required for STUDENT role)',
     example: 'Software Engineering',
   })
   faculty?: string;

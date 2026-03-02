@@ -1,11 +1,27 @@
 import { Module } from '@nestjs/common';
 import { PassportModule } from '@nestjs/passport';
 import { ApplicationModule } from '@application/application.module';
-import { HealthController, AuthController } from './controllers';
+import {
+  HealthController,
+  AuthController,
+  TeacherController,
+  SubjectController,
+  GroupController,
+  GradeController,
+  UserController,
+} from './controllers';
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { JwtStrategy } from './strategies';
 
-const CONTROLLERS = [HealthController, AuthController];
+const CONTROLLERS = [
+  HealthController,
+  AuthController,
+  TeacherController,
+  SubjectController,
+  GroupController,
+  GradeController,
+  UserController,
+];
 
 const GUARDS = [JwtAuthGuard, RolesGuard];
 
