@@ -1,16 +1,46 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
-import { ITeacherRepository } from '@domain/core/interfaces';
+import {
+  Injectable,
+  Inject,
+  NotFoundException,
+  BadRequestException,
+  ConflictException,
+} from '@nestjs/common';
+import { ITeacherRepository, IUserRepository } from '@domain/core/interfaces';
 import { Teacher } from '@domain/entities';
-import { CreateTeacherDto, UpdateTeacherDto } from '@domain/core';
+import { CreateTeacherDto, UpdateTeacherDto, UserRole } from '@domain/core';
 
 @Injectable()
 export class TeacherService {
   constructor(
     @Inject(ITeacherRepository)
     private readonly teacherRepository: ITeacherRepository,
+    @Inject(IUserRepository)
+    private readonly userRepository: IUserRepository,
   ) {}
 
   async create(createTeacherDto: CreateTeacherDto): Promise<Teacher> {
+    const user = await this.userRepository.findById(createTeacherDto.userId);
+    if (!user) {
+      throw new NotFoundException(
+        `User with ID ${createTeacherDto.userId} not found`,
+      );
+    }
+
+    if (user.role !== UserRole.TEACHER) {
+      throw new BadRequestException(
+        'User must have TEACHER role to create a teacher profile',
+      );
+    }
+
+    const existingTeacher = await this.teacherRepository.findByUserId(
+      createTeacherDto.userId,
+    );
+    if (existingTeacher) {
+      throw new ConflictException(
+        'Teacher profile already exists for this user',
+      );
+    }
+
     const teacher = new Teacher(
       undefined,
       createTeacherDto.userId,

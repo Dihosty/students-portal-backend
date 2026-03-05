@@ -9,6 +9,7 @@ import {
   Query,
   HttpCode,
   HttpStatus,
+  ForbiddenException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -18,6 +19,7 @@ import {
   ApiQuery,
 } from '@nestjs/swagger';
 import { GradeService } from '@application/services';
+import { TeacherService } from '@application/services';
 import { CreateGradeDto, UpdateGradeDto } from '@domain/core';
 import { Roles, CurrentUser } from '@presentation/decorators';
 import { UserRole } from '@domain/core/enums';
@@ -26,13 +28,26 @@ import { UserRole } from '@domain/core/enums';
 @ApiBearerAuth()
 @Controller('grades')
 export class GradeController {
-  constructor(private readonly gradeService: GradeService) {}
+  constructor(
+    private readonly gradeService: GradeService,
+    private readonly teacherService: TeacherService,
+  ) {}
 
   @Post()
-  @Roles(UserRole.TEACHER)
-  @ApiOperation({ summary: 'Add new grade (Teacher only)' })
+  @Roles(UserRole.TEACHER, UserRole.ADMIN)
+  @ApiOperation({ summary: 'Add new grade (Teacher/Admin)' })
   @ApiResponse({ status: 201, description: 'Grade added successfully' })
-  async create(@Body() createGradeDto: CreateGradeDto) {
+  async create(
+    @Body() createGradeDto: CreateGradeDto,
+    @CurrentUser() user: any,
+  ) {
+    if (user.role === UserRole.TEACHER) {
+      const teacher = await this.teacherService.findByUserId(user.id);
+      if (!teacher) {
+        throw new ForbiddenException('Teacher profile not found for this user');
+      }
+      createGradeDto.teacherId = teacher.id!;
+    }
     return this.gradeService.create(createGradeDto);
   }
 
