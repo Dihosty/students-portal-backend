@@ -9,6 +9,7 @@ import {
   Min,
   Max,
   IsBoolean,
+  ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../../enums/user-role.enum';
@@ -68,7 +69,8 @@ export class CreateUserDto {
     description: 'Group ID - only for STUDENT role',
     example: 'uuid-group-id',
   })
-  @IsOptional()
+  @ValidateIf((o) => o.role === UserRole.STUDENT)
+  @IsNotEmpty({ message: 'Group ID is required for STUDENT role' })
   @IsString()
   groupId?: string;
 
@@ -78,7 +80,8 @@ export class CreateUserDto {
     minimum: 1,
     maximum: 4,
   })
-  @IsOptional()
+  @ValidateIf((o) => o.role === UserRole.STUDENT)
+  @IsNotEmpty({ message: 'Course year is required for STUDENT role' })
   @IsNumber()
   @Min(1)
   @Max(4)
@@ -88,7 +91,8 @@ export class CreateUserDto {
     description: 'Faculty - required for STUDENT role',
     example: 'Computer Science',
   })
-  @IsOptional()
+  @ValidateIf((o) => o.role === UserRole.STUDENT)
+  @IsNotEmpty({ message: 'Faculty is required for STUDENT role' })
   @IsString()
   faculty?: string;
 

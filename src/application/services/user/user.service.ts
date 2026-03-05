@@ -102,9 +102,8 @@ export class UserService {
       }
     }
 
-    const isStudent =
-      updateUserDto.role === UserRole.STUDENT ||
-      existingUser.role === UserRole.STUDENT;
+    const resultingRole = updateUserDto.role ?? existingUser.role;
+    const isStudent = resultingRole === UserRole.STUDENT;
 
     const updatedUser = new User(
       id,
@@ -112,7 +111,7 @@ export class UserService {
       existingUser.password,
       updateUserDto.firstName ?? existingUser.firstName,
       updateUserDto.lastName ?? existingUser.lastName,
-      updateUserDto.role ?? existingUser.role,
+      resultingRole,
       updateUserDto.isActive ?? existingUser.isActive,
       // Only STUDENT have this
       isStudent
