@@ -5,7 +5,7 @@ import { ApplicationModule } from '@application/application.module';
 import { InfrastructureModule } from '@infrastructure/infrastructure.module';
 import { PresentationModule } from '@presentation/presentation.module';
 import { DATABASE_CONFIG } from '@config/database.config';
-import { JwtAuthGuard } from '@presentation/guards/jwt-auth.guard';
+import { JwtAuthGuard, RolesGuard } from '@presentation/guards';
 
 @Module({
   imports: [
@@ -22,6 +22,10 @@ import { JwtAuthGuard } from '@presentation/guards/jwt-auth.guard';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
     },
   ],
 })

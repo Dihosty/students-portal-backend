@@ -1,10 +1,8 @@
 import { AuthService } from '@application/services';
 import {
   AuthResponseDto,
-  RegisterDto,
   LoginDto,
   UserProfileDto,
-  UpdateProfileDto,
   ChangePasswordDto,
 } from '@domain/core';
 import {
@@ -14,7 +12,6 @@ import {
   HttpCode,
   HttpStatus,
   Get,
-  Put,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -28,18 +25,6 @@ import { Public, CurrentUser } from '@presentation/decorators';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Public()
-  @Post('register')
-  @ApiOperation({ summary: 'Register new user' })
-  @ApiResponse({
-    status: 201,
-    description: 'User successfully registered',
-    type: AuthResponseDto,
-  })
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
-  }
 
   @Public()
   @Post('login')
@@ -64,21 +49,6 @@ export class AuthController {
   })
   async getProfile(@CurrentUser() user: any): Promise<UserProfileDto> {
     return this.authService.getProfile(user.id);
-  }
-
-  @Put('profile')
-  @ApiBearerAuth()
-  @ApiOperation({ summary: 'Update user profile' })
-  @ApiResponse({
-    status: 200,
-    description: 'User profile updated successfully',
-    type: UserProfileDto,
-  })
-  async updateProfile(
-    @CurrentUser() user: any,
-    @Body() updateProfileDto: UpdateProfileDto,
-  ): Promise<UserProfileDto> {
-    return this.authService.updateProfile(user.id, updateProfileDto);
   }
 
   @Post('change-password')

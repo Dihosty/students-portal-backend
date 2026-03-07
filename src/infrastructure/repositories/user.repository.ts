@@ -56,7 +56,6 @@ export class UserRepository implements IUserRepository {
       userOrm.firstName,
       userOrm.lastName,
       userOrm.role,
-      userOrm.isActive,
       userOrm.groupId,
       userOrm.courseYear,
       userOrm.faculty,
@@ -73,7 +72,6 @@ export class UserRepository implements IUserRepository {
     if (user.firstName !== undefined) userOrm.firstName = user.firstName;
     if (user.lastName !== undefined) userOrm.lastName = user.lastName;
     if (user.role !== undefined) userOrm.role = user.role;
-    if (user.isActive !== undefined) userOrm.isActive = user.isActive;
     if (user.groupId !== undefined) userOrm.groupId = user.groupId;
     if (user.courseYear !== undefined) userOrm.courseYear = user.courseYear;
     if (user.faculty !== undefined) userOrm.faculty = user.faculty;
