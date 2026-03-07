@@ -6,7 +6,6 @@ import {
   IsNumber,
   Min,
   Max,
-  IsBoolean,
   ValidateIf,
   IsNotEmpty,
 } from 'class-validator';
@@ -51,10 +50,9 @@ export class UpdateUserDto {
     description: 'Group ID (required when changing to STUDENT role)',
     example: 'uuid-group-id',
   })
-  @ValidateIf((o) => o.role !== undefined)
-  @IsOptional()
   @ValidateIf((o) => o.role === UserRole.STUDENT)
   @IsNotEmpty({ message: 'Group ID is required when role is STUDENT' })
+  @ValidateIf((o) => o.groupId !== undefined && o.groupId !== null)
   @IsString()
   groupId?: string | null;
 
@@ -64,10 +62,9 @@ export class UpdateUserDto {
     minimum: 1,
     maximum: 4,
   })
-  @ValidateIf((o) => o.role !== undefined)
-  @IsOptional()
   @ValidateIf((o) => o.role === UserRole.STUDENT)
   @IsNotEmpty({ message: 'Course year is required when role is STUDENT' })
+  @ValidateIf((o) => o.courseYear !== undefined && o.courseYear !== null)
   @IsNumber()
   @Min(1)
   @Max(4)
@@ -77,18 +74,9 @@ export class UpdateUserDto {
     description: 'Faculty (required when changing to STUDENT role)',
     example: 'Software Engineering',
   })
-  @ValidateIf((o) => o.role !== undefined)
-  @IsOptional()
   @ValidateIf((o) => o.role === UserRole.STUDENT)
   @IsNotEmpty({ message: 'Faculty is required when role is STUDENT' })
+  @ValidateIf((o) => o.faculty !== undefined && o.faculty !== null)
   @IsString()
   faculty?: string | null;
-
-  @ApiPropertyOptional({
-    description: 'Is user active',
-    example: true,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 }

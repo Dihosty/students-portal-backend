@@ -1,9 +1,7 @@
 import {
   IUserRepository,
-  RegisterDto,
   AuthResponseDto,
   LoginDto,
-  UpdateProfileDto,
   ChangePasswordDto,
   UserProfileDto,
   UserRole,
@@ -28,42 +26,10 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
-    const existingUser = await this.userRepository.findByEmail(
-      registerDto.email,
-    );
-    if (existingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
-
-    const newUser = new User(
-      undefined,
-      registerDto.email,
-      hashedPassword,
-      registerDto.firstName,
-      registerDto.lastName,
-      UserRole.STUDENT,
-      true,
-      registerDto.groupId,
-      registerDto.courseYear,
-      registerDto.faculty,
-    );
-
-    const createdUser = await this.userRepository.create(newUser);
-
-    return this.generateAuthResponse(createdUser);
-  }
-
   async login(loginDto: LoginDto): Promise<AuthResponseDto> {
     const user = await this.userRepository.findByEmail(loginDto.email);
     if (!user) {
       throw new UnauthorizedException('Wrong email or password');
-    }
-
-    if (!user.isActive) {
-      throw new UnauthorizedException('Account is deactivated');
     }
 
     const isPasswordValid = await bcrypt.compare(
@@ -97,37 +63,8 @@ export class AuthService {
       groupId: user.groupId,
       courseYear: user.courseYear,
       faculty: user.faculty,
-      isActive: user.isActive,
       createdAt: user.createdAt!,
     };
-  }
-
-  async updateProfile(
-    userId: string,
-    updateProfileDto: UpdateProfileDto,
-  ): Promise<UserProfileDto> {
-    const user = await this.userRepository.findById(userId);
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-
-    const updatedUser = new User(
-      user.id,
-      user.email,
-      user.password,
-      updateProfileDto.firstName ?? user.firstName,
-      updateProfileDto.lastName ?? user.lastName,
-      user.role,
-      user.isActive,
-      updateProfileDto.groupId ?? user.groupId,
-      updateProfileDto.courseYear ?? user.courseYear,
-      updateProfileDto.faculty ?? user.faculty,
-      user.createdAt,
-      user.updatedAt,
-    );
-
-    await this.userRepository.update(userId, updatedUser);
-    return this.getProfile(userId);
   }
 
   async changePassword(
@@ -156,7 +93,6 @@ export class AuthService {
       user.firstName,
       user.lastName,
       user.role,
-      user.isActive,
       user.groupId,
       user.courseYear,
       user.faculty,

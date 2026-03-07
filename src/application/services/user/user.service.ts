@@ -32,7 +32,6 @@ export class UserService {
       groupId: user.groupId,
       courseYear: user.courseYear,
       faculty: user.faculty,
-      isActive: user.isActive,
       createdAt: user.createdAt!,
     };
   }
@@ -57,7 +56,6 @@ export class UserService {
       createUserDto.firstName,
       createUserDto.lastName,
       createUserDto.role,
-      createUserDto.isActive ?? true,
       isStudent ? createUserDto.groupId : undefined,
       isStudent ? createUserDto.courseYear : undefined,
       isStudent ? createUserDto.faculty : undefined,
@@ -112,7 +110,6 @@ export class UserService {
       updateUserDto.firstName ?? existingUser.firstName,
       updateUserDto.lastName ?? existingUser.lastName,
       resultingRole,
-      updateUserDto.isActive ?? existingUser.isActive,
       // Only STUDENT have this
       isStudent
         ? updateUserDto.groupId !== undefined
@@ -141,51 +138,5 @@ export class UserService {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
     await this.userRepository.delete(id);
-  }
-
-  async deactivate(id: string): Promise<UserProfileDto> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    const deactivatedUser = new User(
-      id,
-      user.email,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.role,
-      false,
-      user.groupId,
-      user.courseYear,
-      user.faculty,
-    );
-
-    const result = await this.userRepository.update(id, deactivatedUser);
-    return this.toUserProfile(result);
-  }
-
-  async activate(id: string): Promise<UserProfileDto> {
-    const user = await this.userRepository.findById(id);
-    if (!user) {
-      throw new NotFoundException(`User with ID ${id} not found`);
-    }
-
-    const activatedUser = new User(
-      id,
-      user.email,
-      user.password,
-      user.firstName,
-      user.lastName,
-      user.role,
-      true,
-      user.groupId,
-      user.courseYear,
-      user.faculty,
-    );
-
-    const result = await this.userRepository.update(id, activatedUser);
-    return this.toUserProfile(result);
   }
 }

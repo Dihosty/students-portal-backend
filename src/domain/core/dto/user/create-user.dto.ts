@@ -4,11 +4,9 @@ import {
   IsNotEmpty,
   IsString,
   MinLength,
-  IsOptional,
   IsNumber,
   Min,
   Max,
-  IsBoolean,
   ValidateIf,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -95,13 +93,4 @@ export class CreateUserDto {
   @IsNotEmpty({ message: 'Faculty is required for STUDENT role' })
   @IsString()
   faculty?: string;
-
-  @ApiPropertyOptional({
-    description: 'Is user active',
-    example: true,
-    default: true,
-  })
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 }

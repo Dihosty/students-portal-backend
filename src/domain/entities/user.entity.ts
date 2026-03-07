@@ -13,7 +13,6 @@ export class User {
     public firstName: string,
     public lastName: string,
     public role: UserRole,
-    public isActive: boolean,
     public groupId?: string,
     public courseYear?: number,
     public faculty?: string,

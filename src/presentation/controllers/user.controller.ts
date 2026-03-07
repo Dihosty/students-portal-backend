@@ -100,30 +100,4 @@ export class UserController {
   async delete(@Param('id') id: string): Promise<void> {
     await this.userService.delete(id);
   }
-
-  @Post(':id/deactivate')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Deactivate user (Admin only)' })
-  @ApiResponse({
-    status: 200,
-    description: 'User deactivated successfully',
-    type: UserProfileDto,
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async deactivate(@Param('id') id: string): Promise<UserProfileDto> {
-    return this.userService.deactivate(id);
-  }
-
-  @Post(':id/activate')
-  @Roles(UserRole.ADMIN)
-  @ApiOperation({ summary: 'Activate user (Admin only)' })
-  @ApiResponse({
-    status: 200,
-    description: 'User activated successfully',
-    type: UserProfileDto,
-  })
-  @ApiResponse({ status: 404, description: 'User not found' })
-  async activate(@Param('id') id: string): Promise<UserProfileDto> {
-    return this.userService.activate(id);
-  }
 }
