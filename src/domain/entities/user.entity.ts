@@ -15,7 +15,7 @@ export class User {
     public role: UserRole,
     public groupId?: string,
     public courseYear?: number,
-    public faculty?: string,
+    public facultyId?: string,
     public createdAt?: Date,
     public updatedAt?: Date,
   ) {}

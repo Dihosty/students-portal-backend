@@ -15,7 +15,7 @@ export class GradeService {
       undefined,
       createGradeDto.studentId,
       createGradeDto.subjectId,
-      createGradeDto.teacherId,
+      createGradeDto.teacherId!,
       createGradeDto.score,
       createGradeDto.type,
       new Date(createGradeDto.date),

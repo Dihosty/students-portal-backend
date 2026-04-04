@@ -6,9 +6,11 @@ import {
   OneToOne,
   JoinColumn,
   OneToMany,
+  ManyToOne,
 } from 'typeorm';
 import { UserOrmEntity } from './user.orm-entity';
 import { SubjectOrmEntity } from './subject.orm-entity';
+import { FacultyOrmEntity } from './faculty.orm-entity';
 
 @Entity('teachers')
 export class TeacherOrmEntity {
@@ -22,8 +24,12 @@ export class TeacherOrmEntity {
   @JoinColumn({ name: 'user_id' })
   user: UserOrmEntity;
 
-  @Column()
-  faculty: string;
+  @Column({ name: 'faculty_id' })
+  facultyId: string;
+
+  @ManyToOne(() => FacultyOrmEntity)
+  @JoinColumn({ name: 'faculty_id' })
+  faculty: FacultyOrmEntity;
 
   @OneToMany(() => SubjectOrmEntity, (subject) => subject.teacher)
   subjects: SubjectOrmEntity[];

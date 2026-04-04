@@ -58,7 +58,7 @@ export class UserRepository implements IUserRepository {
       userOrm.role,
       userOrm.groupId,
       userOrm.courseYear,
-      userOrm.faculty,
+      userOrm.facultyId,
       userOrm.createdAt,
       userOrm.updatedAt,
     );
@@ -74,7 +74,7 @@ export class UserRepository implements IUserRepository {
     if (user.role !== undefined) userOrm.role = user.role;
     if (user.groupId !== undefined) userOrm.groupId = user.groupId;
     if (user.courseYear !== undefined) userOrm.courseYear = user.courseYear;
-    if (user.faculty !== undefined) userOrm.faculty = user.faculty;
+    if (user.facultyId !== undefined) userOrm.facultyId = user.facultyId;
     return userOrm;
   }
 }

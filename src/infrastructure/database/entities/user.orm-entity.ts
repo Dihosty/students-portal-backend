@@ -9,6 +9,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { GroupOrmEntity } from './group.orm-entity';
+import { FacultyOrmEntity } from './faculty.orm-entity';
 
 @Entity('users')
 export class UserOrmEntity {
@@ -47,8 +48,12 @@ export class UserOrmEntity {
   @Column({ name: 'course_year', nullable: true })
   courseYear?: number;
 
-  @Column({ nullable: true })
-  faculty?: string;
+  @Column({ name: 'faculty_id', nullable: true })
+  facultyId?: string;
+
+  @ManyToOne(() => FacultyOrmEntity)
+  @JoinColumn({ name: 'faculty_id' })
+  faculty?: FacultyOrmEntity;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

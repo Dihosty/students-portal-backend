@@ -9,6 +9,9 @@ import {
   GroupController,
   GradeController,
   UserController,
+  PredictionController,
+  StudentsController,
+  FacultyController,
 } from './controllers';
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { JwtStrategy } from './strategies';
@@ -21,6 +24,9 @@ const CONTROLLERS = [
   GroupController,
   GradeController,
   UserController,
+  PredictionController,
+  StudentsController,
+  FacultyController,
 ];
 
 const GUARDS = [JwtAuthGuard, RolesGuard];

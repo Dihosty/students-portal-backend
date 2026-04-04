@@ -16,7 +16,11 @@ import {
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { TeacherService } from '@application/services';
-import { CreateTeacherDto, UpdateTeacherDto } from '@domain/core';
+import {
+  CreateTeacherDto,
+  TeacherProfileDto,
+  UpdateTeacherDto,
+} from '@domain/core';
 import { Roles } from '@presentation/decorators';
 import { UserRole } from '@domain/core/enums';
 
@@ -35,20 +39,28 @@ export class TeacherController {
   }
 
   @Get()
-  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @ApiOperation({ summary: 'Get all teachers' })
-  @ApiResponse({ status: 200, description: 'List of all teachers' })
-  async findAll() {
-    return this.teacherService.findAll();
+  @ApiResponse({
+    status: 200,
+    description: 'List of all teachers',
+    type: [TeacherProfileDto],
+  })
+  async findAll(): Promise<TeacherProfileDto[]> {
+    return this.teacherService.findAllProfiles();
   }
 
   @Get(':id')
-  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
   @ApiOperation({ summary: 'Get teacher by ID' })
-  @ApiResponse({ status: 200, description: 'Teacher found' })
+  @ApiResponse({
+    status: 200,
+    description: 'Teacher found',
+    type: TeacherProfileDto,
+  })
   @ApiResponse({ status: 404, description: 'Teacher not found' })
-  async findById(@Param('id') id: string) {
-    return this.teacherService.findById(id);
+  async findById(@Param('id') id: string): Promise<TeacherProfileDto> {
+    return this.teacherService.findProfileById(id);
   }
 
   @Put(':id')

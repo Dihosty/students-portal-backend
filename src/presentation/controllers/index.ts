@@ -5,3 +5,6 @@ export * from './subject.controller';
 export * from './group.controller';
 export * from './grade.controller';
 export * from './user.controller';
+export * from './prediction.controller';
+export * from './students.controller';
+export * from './faculty.controller';

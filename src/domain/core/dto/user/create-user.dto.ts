@@ -8,6 +8,7 @@ import {
   Min,
   Max,
   ValidateIf,
+  IsUUID,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../../enums/user-role.enum';
@@ -15,7 +16,7 @@ import { UserRole } from '../../enums/user-role.enum';
 /**
  * Admin-only DTO for creating users with any role
  * Field requirements based on role:
- * - STUDENT: requires groupId, courseYear, and faculty
+ * - STUDENT: requires groupId, courseYear, and facultyId
  * - TEACHER: no additional fields needed
  * - ADMIN: no additional fields needed
  */
@@ -86,11 +87,11 @@ export class CreateUserDto {
   courseYear?: number;
 
   @ApiPropertyOptional({
-    description: 'Faculty - required for STUDENT role',
-    example: 'Computer Science',
+    description: 'Faculty ID - required for STUDENT role',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
   })
   @ValidateIf((o) => o.role === UserRole.STUDENT)
-  @IsNotEmpty({ message: 'Faculty is required for STUDENT role' })
-  @IsString()
-  faculty?: string;
+  @IsNotEmpty({ message: 'Faculty ID is required for STUDENT role' })
+  @IsUUID()
+  facultyId?: string;
 }
