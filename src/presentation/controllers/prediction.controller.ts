@@ -1,27 +1,22 @@
 import { PredictionService } from '@application/services';
 import {
-  PredictStudentDto,
   PredictionResponseDto,
-  RiskStudentResponseDto,
-  WhatIfDto,
-  WhatIfResponseDto,
+  RiskStudentsResponseDto,
+  ScopeAnalyticsDto,
+  StudentAnalyticsDto,
   UserRole,
 } from '@domain/core';
 import { CurrentUser, Roles } from '@presentation/decorators';
 import {
-  Body,
   Controller,
   ForbiddenException,
   Get,
   Param,
-  ParseIntPipe,
-  Post,
-  Query,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -32,59 +27,101 @@ import {
 export class PredictionController {
   constructor(private readonly predictionService: PredictionService) {}
 
-  @Post('student/:studentId')
+  @Get('student/:studentId')
   @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @ApiOperation({ summary: 'Predict final score for student in subject' })
+  @ApiOperation({ summary: 'Analytics for a specific student' })
   @ApiResponse({
-    status: 201,
-    description: 'Prediction calculated successfully',
+    status: 200,
+    description: 'Student analytics calculated successfully',
+    type: StudentAnalyticsDto,
+  })
+  async analyzeStudent(
+    @Param('studentId', new ParseUUIDPipe()) studentId: string,
+    @CurrentUser() user: any,
+  ): Promise<StudentAnalyticsDto> {
+    if (user.role === UserRole.STUDENT && user.id !== studentId) {
+      throw new ForbiddenException(
+        'Students can view only their own analytics',
+      );
+    }
+
+    return this.predictionService.analyzeStudent(studentId);
+  }
+
+  @Get('student/:studentId/subject/:subjectId')
+  @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
+  @ApiOperation({
+    summary:
+      'Student subject analytics + performance prediction (weighted by grade type)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Analytics calculated successfully',
     type: PredictionResponseDto,
   })
-  async predictStudent(
-    @Param('studentId') studentId: string,
-    @Body() dto: PredictStudentDto,
+  async analyzeStudentSubject(
+    @Param('studentId', new ParseUUIDPipe()) studentId: string,
+    @Param('subjectId', new ParseUUIDPipe()) subjectId: string,
     @CurrentUser() user: any,
   ): Promise<PredictionResponseDto> {
     if (user.role === UserRole.STUDENT && user.id !== studentId) {
       throw new ForbiddenException('Students can predict only their own data');
     }
 
-    return this.predictionService.predictStudent(studentId, dto.subjectId);
+    return this.predictionService.predictStudent(studentId, subjectId);
+  }
+
+  @Get('subject/:subjectId')
+  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({ summary: 'Analytics for a specific subject' })
+  @ApiResponse({
+    status: 200,
+    description: 'Subject analytics calculated successfully',
+    type: ScopeAnalyticsDto,
+  })
+  async analyzeSubject(
+    @Param('subjectId', new ParseUUIDPipe()) subjectId: string,
+  ): Promise<ScopeAnalyticsDto> {
+    return this.predictionService.analyzeSubject(subjectId);
+  }
+
+  @Get('group/:groupId')
+  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({ summary: 'Analytics for a specific group' })
+  @ApiResponse({
+    status: 200,
+    description: 'Group analytics calculated successfully',
+    type: ScopeAnalyticsDto,
+  })
+  async analyzeGroup(
+    @Param('groupId', new ParseUUIDPipe()) groupId: string,
+  ): Promise<ScopeAnalyticsDto> {
+    return this.predictionService.analyzeGroup(groupId);
+  }
+
+  @Get('faculty/:facultyId')
+  @Roles(UserRole.ADMIN, UserRole.TEACHER)
+  @ApiOperation({ summary: 'Analytics for a specific faculty' })
+  @ApiResponse({
+    status: 200,
+    description: 'Faculty analytics calculated successfully',
+    type: ScopeAnalyticsDto,
+  })
+  async analyzeFaculty(
+    @Param('facultyId', new ParseUUIDPipe()) facultyId: string,
+  ): Promise<ScopeAnalyticsDto> {
+    return this.predictionService.analyzeFaculty(facultyId);
   }
 
   @Get('risk-students')
   @Roles(UserRole.ADMIN, UserRole.TEACHER)
-  @ApiOperation({ summary: 'Get students at academic risk(ADMIN/TEACHER)' })
-  @ApiQuery({ name: 'limit', required: false, example: 10 })
+  @ApiOperation({ summary: 'Get list of at-risk students' })
   @ApiResponse({
     status: 200,
-    description: 'Risk students calculated successfully',
-    type: [RiskStudentResponseDto],
+    description: 'At-risk students list returned successfully',
+    type: RiskStudentsResponseDto,
   })
-  async findRiskStudents(
-    @Query('limit', new ParseIntPipe({ optional: true })) limit?: number,
-  ): Promise<RiskStudentResponseDto[]> {
-    return this.predictionService.findRiskStudents(limit ?? 10);
-  }
-
-  @Post('what-if')
-  @Roles(UserRole.ADMIN, UserRole.TEACHER, UserRole.STUDENT)
-  @ApiOperation({ summary: 'Run what-if scenario for hypothetical exam score' })
-  @ApiResponse({
-    status: 201,
-    description: 'What-if scenario calculated successfully',
-    type: WhatIfResponseDto,
-  })
-  async whatIf(
-    @Body() dto: WhatIfDto,
-    @CurrentUser() user: any,
-  ): Promise<WhatIfResponseDto> {
-    if (user.role === UserRole.STUDENT && user.id !== dto.studentId) {
-      throw new ForbiddenException(
-        'Students can run what-if only for themselves',
-      );
-    }
-
-    return this.predictionService.whatIf(dto);
+  async listRiskStudents(): Promise<RiskStudentsResponseDto> {
+    return this.predictionService.listRiskStudents();
   }
 }

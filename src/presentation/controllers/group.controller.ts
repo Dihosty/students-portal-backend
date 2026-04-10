@@ -39,12 +39,16 @@ export class GroupController {
   @Get()
   @ApiOperation({ summary: 'Get all groups' })
   @ApiQuery({ name: 'courseYear', required: false, type: Number })
+  @ApiQuery({ name: 'facultyId', required: false, type: String })
   @ApiResponse({ status: 200, description: 'List of groups' })
-  async findAll(@Query('courseYear') courseYear?: number) {
-    if (courseYear) {
-      return this.groupService.findByCourseYear(Number(courseYear));
-    }
-    return this.groupService.findAll();
+  async findAll(
+    @Query('courseYear') courseYear?: number,
+    @Query('facultyId') facultyId?: string,
+  ) {
+    return this.groupService.findAll({
+      courseYear: courseYear ? Number(courseYear) : undefined,
+      facultyId,
+    });
   }
 
   @Get(':id')
