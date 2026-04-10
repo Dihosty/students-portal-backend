@@ -3,3 +3,4 @@ export * from './teacher.entity';
 export * from './subject.entity';
 export * from './group.entity';
 export * from './grade.entity';
+export * from './faculty.entity';

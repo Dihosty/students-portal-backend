@@ -8,6 +8,7 @@ import {
   SubjectOrmEntity,
   GroupOrmEntity,
   GradeOrmEntity,
+  FacultyOrmEntity,
 } from './database';
 import {
   UserRepository,
@@ -15,6 +16,7 @@ import {
   SubjectRepository,
   GroupRepository,
   GradeRepository,
+  FacultyRepository,
 } from './repositories';
 import {
   IUserRepository,
@@ -22,6 +24,7 @@ import {
   ISubjectRepository,
   IGroupRepository,
   IGradeRepository,
+  IFacultyRepository,
 } from '@domain/core';
 
 const REPOSITORIES = [
@@ -30,6 +33,7 @@ const REPOSITORIES = [
   SubjectRepository,
   GroupRepository,
   GradeRepository,
+  FacultyRepository,
 ];
 
 const PROVIDERS = [
@@ -53,6 +57,10 @@ const PROVIDERS = [
     provide: IGradeRepository,
     useClass: GradeRepository,
   },
+  {
+    provide: IFacultyRepository,
+    useClass: FacultyRepository,
+  },
 ];
 
 const PORT_TOKENS = [
@@ -61,6 +69,7 @@ const PORT_TOKENS = [
   ISubjectRepository,
   IGroupRepository,
   IGradeRepository,
+  IFacultyRepository,
 ];
 
 const ENTITIES = [
@@ -69,6 +78,7 @@ const ENTITIES = [
   SubjectOrmEntity,
   GroupOrmEntity,
   GradeOrmEntity,
+  FacultyOrmEntity,
 ];
 
 @Module({

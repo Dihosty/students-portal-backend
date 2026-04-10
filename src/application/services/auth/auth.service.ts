@@ -1,16 +1,15 @@
 import {
   IUserRepository,
+  IFacultyRepository,
   AuthResponseDto,
   LoginDto,
   ChangePasswordDto,
   UserProfileDto,
-  UserRole,
 } from '@domain/core';
 import { User } from '@domain/entities';
 import {
   Injectable,
   UnauthorizedException,
-  ConflictException,
   Inject,
   NotFoundException,
   BadRequestException,
@@ -23,6 +22,8 @@ export class AuthService {
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
+    @Inject(IFacultyRepository)
+    private readonly facultyRepository: IFacultyRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -53,6 +54,10 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
+    const facultyName = user.facultyId
+      ? (await this.facultyRepository.findById(user.facultyId))?.name
+      : undefined;
+
     return {
       id: user.id!,
       email: user.email,
@@ -62,7 +67,8 @@ export class AuthService {
       role: user.role,
       groupId: user.groupId,
       courseYear: user.courseYear,
-      faculty: user.faculty,
+      facultyId: user.facultyId,
+      facultyName,
       createdAt: user.createdAt!,
     };
   }
@@ -95,7 +101,7 @@ export class AuthService {
       user.role,
       user.groupId,
       user.courseYear,
-      user.faculty,
+      user.facultyId,
       user.createdAt,
       user.updatedAt,
     );

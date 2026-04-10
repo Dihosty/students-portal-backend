@@ -9,6 +9,8 @@ import {
   GroupService,
   GradeService,
   UserService,
+  PredictionService,
+  FacultyService,
 } from './services';
 
 const SERVICES = [
@@ -18,6 +20,8 @@ const SERVICES = [
   GroupService,
   GradeService,
   UserService,
+  PredictionService,
+  FacultyService,
 ];
 
 @Module({

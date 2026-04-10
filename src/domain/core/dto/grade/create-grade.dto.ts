@@ -1,5 +1,5 @@
 import { GradeType } from '@domain/core/enums';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsNotEmpty,
   IsUUID,
@@ -8,12 +8,13 @@ import {
   Max,
   IsEnum,
   IsDateString,
+  IsOptional,
 } from 'class-validator';
 
 export class CreateGradeDto {
   @ApiProperty({
     description: 'Student ID',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: '1dfaf7ff-4907-4f28-ab5f-ddaa45381798',
   })
   @IsNotEmpty()
   @IsUUID()
@@ -21,19 +22,20 @@ export class CreateGradeDto {
 
   @ApiProperty({
     description: 'Subject ID',
-    example: '123e4567-e89b-12d3-a456-426614174001',
+    example: 'db947f1c-14bd-49da-88c0-aeac00358ba6',
   })
   @IsNotEmpty()
   @IsUUID()
   subjectId: string;
 
-  @ApiProperty({
-    description: 'Teacher ID',
-    example: '123e4567-e89b-12d3-a456-426614174002',
+  @ApiPropertyOptional({
+    description:
+      'Teacher ID (required for ADMIN; ignored/auto-set for TEACHER role)',
+    example: 'a087a6ee-0497-4a47-bacf-e3138ee5175a',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID()
-  teacherId: string;
+  teacherId?: string;
 
   @ApiProperty({
     description: 'Score (0-100)',

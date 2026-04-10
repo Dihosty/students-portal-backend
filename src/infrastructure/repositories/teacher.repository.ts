@@ -50,7 +50,7 @@ export class TeacherRepository implements ITeacherRepository {
     return new Teacher(
       teacherOrm.id,
       teacherOrm.userId,
-      teacherOrm.faculty,
+      teacherOrm.facultyId,
       teacherOrm.createdAt,
     );
   }
@@ -59,7 +59,7 @@ export class TeacherRepository implements ITeacherRepository {
     const teacherOrm: Partial<TeacherOrmEntity> = {};
     if (teacher.id !== undefined) teacherOrm.id = teacher.id;
     if (teacher.userId !== undefined) teacherOrm.userId = teacher.userId;
-    if (teacher.faculty !== undefined) teacherOrm.faculty = teacher.faculty;
+    if (teacher.facultyId !== undefined) teacherOrm.facultyId = teacher.facultyId;
     return teacherOrm;
   }
 }

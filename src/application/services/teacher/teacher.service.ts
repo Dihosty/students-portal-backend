@@ -7,7 +7,13 @@ import {
 } from '@nestjs/common';
 import { ITeacherRepository, IUserRepository } from '@domain/core/interfaces';
 import { Teacher } from '@domain/entities';
-import { CreateTeacherDto, UpdateTeacherDto, UserRole } from '@domain/core';
+import {
+  CreateTeacherDto,
+  IFacultyRepository,
+  UpdateTeacherDto,
+  UserRole,
+  TeacherProfileDto,
+} from '@domain/core';
 
 @Injectable()
 export class TeacherService {
@@ -16,6 +22,8 @@ export class TeacherService {
     private readonly teacherRepository: ITeacherRepository,
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
+    @Inject(IFacultyRepository)
+    private readonly facultyRepository: IFacultyRepository,
   ) {}
 
   async create(createTeacherDto: CreateTeacherDto): Promise<Teacher> {
@@ -41,10 +49,17 @@ export class TeacherService {
       );
     }
 
+    const facultyExists = await this.facultyRepository.findById(
+      createTeacherDto.facultyId,
+    );
+    if (!facultyExists) {
+      throw new BadRequestException('Faculty not found');
+    }
+
     const teacher = new Teacher(
       undefined,
       createTeacherDto.userId,
-      createTeacherDto.faculty,
+      createTeacherDto.facultyId,
     );
     return this.teacherRepository.create(teacher);
   }
@@ -61,6 +76,48 @@ export class TeacherService {
     return teacher;
   }
 
+  async findAllProfiles(): Promise<TeacherProfileDto[]> {
+    const [teachers, users, faculties] = await Promise.all([
+      this.teacherRepository.findAll(),
+      this.userRepository.findAll(),
+      this.facultyRepository.findAll(),
+    ]);
+
+    const userById = new Map(users.map((u) => [u.id!, u]));
+    const facultyById = new Map(faculties.map((f) => [f.id!, f]));
+
+    return teachers.map((teacher) => {
+      const user = userById.get(teacher.userId);
+      const faculty = facultyById.get(teacher.facultyId);
+
+      return {
+        id: teacher.id!,
+        userId: teacher.userId,
+        fullName: user ? `${user.firstName} ${user.lastName}` : 'Unknown teacher',
+        facultyId: teacher.facultyId,
+        facultyName: faculty?.name ?? 'Unknown faculty',
+        createdAt: teacher.createdAt!,
+      };
+    });
+  }
+
+  async findProfileById(id: string): Promise<TeacherProfileDto> {
+    const teacher = await this.findById(id);
+    const [user, faculty] = await Promise.all([
+      this.userRepository.findById(teacher.userId),
+      this.facultyRepository.findById(teacher.facultyId),
+    ]);
+
+    return {
+      id: teacher.id!,
+      userId: teacher.userId,
+      fullName: user ? `${user.firstName} ${user.lastName}` : 'Unknown teacher',
+      facultyId: teacher.facultyId,
+      facultyName: faculty?.name ?? 'Unknown faculty',
+      createdAt: teacher.createdAt!,
+    };
+  }
+
   async findByUserId(userId: string): Promise<Teacher | null> {
     return this.teacherRepository.findByUserId(userId);
   }
@@ -71,10 +128,22 @@ export class TeacherService {
   ): Promise<Teacher> {
     const existingTeacher = await this.findById(id);
 
+    const resultingFacultyId =
+      updateTeacherDto.facultyId ?? existingTeacher.facultyId;
+
+    if (updateTeacherDto.facultyId) {
+      const facultyExists = await this.facultyRepository.findById(
+        updateTeacherDto.facultyId,
+      );
+      if (!facultyExists) {
+        throw new BadRequestException('Faculty not found');
+      }
+    }
+
     const updatedTeacher = new Teacher(
       existingTeacher.id,
       existingTeacher.userId,
-      updateTeacherDto.faculty ?? existingTeacher.faculty,
+      resultingFacultyId,
       existingTeacher.createdAt,
     );
 

@@ -3,13 +3,16 @@ import {
   Inject,
   NotFoundException,
   ConflictException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   IUserRepository,
+  IFacultyRepository,
   CreateUserDto,
   UpdateUserDto,
   UserProfileDto,
   UserRole,
+  StudentListItemDto,
 } from '@domain/core';
 import { User } from '@domain/entities';
 import * as bcrypt from 'bcrypt';
@@ -19,6 +22,8 @@ export class UserService {
   constructor(
     @Inject(IUserRepository)
     private readonly userRepository: IUserRepository,
+    @Inject(IFacultyRepository)
+    private readonly facultyRepository: IFacultyRepository,
   ) {}
 
   private toUserProfile(user: User): UserProfileDto {
@@ -31,7 +36,7 @@ export class UserService {
       role: user.role,
       groupId: user.groupId,
       courseYear: user.courseYear,
-      faculty: user.faculty,
+      facultyId: user.facultyId,
       createdAt: user.createdAt!,
     };
   }
@@ -46,8 +51,17 @@ export class UserService {
 
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
 
-    // Only STUDENT have groupId, courseYear, and faculty
+    // Only STUDENT have groupId, courseYear, and facultyId
     const isStudent = createUserDto.role === UserRole.STUDENT;
+
+    if (isStudent) {
+      const facultyExists = await this.facultyRepository.findById(
+        createUserDto.facultyId!,
+      );
+      if (!facultyExists) {
+        throw new BadRequestException('Faculty not found');
+      }
+    }
 
     const newUser = new User(
       undefined,
@@ -58,7 +72,7 @@ export class UserService {
       createUserDto.role,
       isStudent ? createUserDto.groupId : undefined,
       isStudent ? createUserDto.courseYear : undefined,
-      isStudent ? createUserDto.faculty : undefined,
+      isStudent ? createUserDto.facultyId : undefined,
     );
 
     const createdUser = await this.userRepository.create(newUser);
@@ -68,6 +82,25 @@ export class UserService {
   async findAll(): Promise<UserProfileDto[]> {
     const users = await this.userRepository.findAll();
     return users.map((user) => this.toUserProfile(user));
+  }
+
+  async findStudents(): Promise<StudentListItemDto[]> {
+    const users = await this.userRepository.findAll();
+    const faculties = await this.facultyRepository.findAll();
+    const facultyById = new Map(faculties.map((f) => [f.id!, f]));
+
+    return users
+      .filter((user) => user.role === UserRole.STUDENT)
+      .map((student) => ({
+        id: student.id!,
+        fullName: `${student.firstName} ${student.lastName}`,
+        groupId: student.groupId,
+        courseYear: student.courseYear,
+        facultyId: student.facultyId,
+        facultyName: student.facultyId
+          ? facultyById.get(student.facultyId)?.name
+          : undefined,
+      }));
   }
 
   async findById(id: string): Promise<UserProfileDto> {
@@ -103,6 +136,21 @@ export class UserService {
     const resultingRole = updateUserDto.role ?? existingUser.role;
     const isStudent = resultingRole === UserRole.STUDENT;
 
+    const resultingFacultyId = isStudent
+      ? updateUserDto.facultyId !== undefined
+        ? (updateUserDto.facultyId ?? undefined)
+        : existingUser.facultyId
+      : undefined;
+
+    if (isStudent && resultingFacultyId) {
+      const facultyExists = await this.facultyRepository.findById(
+        resultingFacultyId,
+      );
+      if (!facultyExists) {
+        throw new BadRequestException('Faculty not found');
+      }
+    }
+
     const updatedUser = new User(
       id,
       updateUserDto.email ?? existingUser.email,
@@ -122,9 +170,7 @@ export class UserService {
           : existingUser.courseYear
         : undefined,
       isStudent
-        ? updateUserDto.faculty !== undefined
-          ? (updateUserDto.faculty ?? undefined)
-          : existingUser.faculty
+        ? resultingFacultyId
         : undefined,
     );
 

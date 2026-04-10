@@ -52,10 +52,16 @@ export class UserProfileDto {
   courseYear?: number;
 
   @ApiPropertyOptional({
-    description: 'Faculty name (required for STUDENT role)',
+    description: 'Faculty ID (required for STUDENT role)',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
+  })
+  facultyId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Faculty name (for UI display)',
     example: 'Software Engineering',
   })
-  faculty?: string;
+  facultyName?: string;
 
   @ApiProperty({
     description: 'Created at',

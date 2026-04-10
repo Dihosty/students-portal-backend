@@ -1,8 +1,8 @@
-export class Teacher {
+export class Faculty {
   constructor(
     public id: string | undefined,
-    public userId: string,
-    public facultyId: string,
+    public name: string,
     public createdAt?: Date,
   ) {}
 }
+

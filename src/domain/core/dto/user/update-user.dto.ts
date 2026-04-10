@@ -8,6 +8,7 @@ import {
   Max,
   ValidateIf,
   IsNotEmpty,
+  IsUUID,
 } from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '@domain/core/enums';
@@ -71,12 +72,12 @@ export class UpdateUserDto {
   courseYear?: number | null;
 
   @ApiPropertyOptional({
-    description: 'Faculty (required when changing to STUDENT role)',
-    example: 'Software Engineering',
+    description: 'Faculty ID (required when changing to STUDENT role)',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
   })
   @ValidateIf((o) => o.role === UserRole.STUDENT)
-  @IsNotEmpty({ message: 'Faculty is required when role is STUDENT' })
-  @ValidateIf((o) => o.faculty !== undefined && o.faculty !== null)
-  @IsString()
-  faculty?: string | null;
+  @IsNotEmpty({ message: 'Faculty ID is required when role is STUDENT' })
+  @ValidateIf((o) => o.facultyId !== undefined && o.facultyId !== null)
+  @IsUUID()
+  facultyId?: string | null;
 }

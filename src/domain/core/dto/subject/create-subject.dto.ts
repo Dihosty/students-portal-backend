@@ -12,7 +12,7 @@ export class CreateSubjectDto {
 
   @ApiProperty({
     description: 'Teacher ID',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
   })
   @IsNotEmpty()
   @IsUUID()

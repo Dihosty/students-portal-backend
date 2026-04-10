@@ -51,6 +51,7 @@ export class GroupRepository implements IGroupRepository {
       groupOrm.id,
       groupOrm.name,
       groupOrm.courseYear,
+      groupOrm.facultyId,
       groupOrm.createdAt,
     );
   }
@@ -60,6 +61,7 @@ export class GroupRepository implements IGroupRepository {
     if (group.id !== undefined) groupOrm.id = group.id;
     if (group.name !== undefined) groupOrm.name = group.name;
     if (group.courseYear !== undefined) groupOrm.courseYear = group.courseYear;
+    if (group.facultyId !== undefined) groupOrm.facultyId = group.facultyId;
     return groupOrm;
   }
 }

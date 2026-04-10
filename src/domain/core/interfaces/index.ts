@@ -3,3 +3,4 @@ export * from './teacher.repository';
 export * from './subject.repository';
 export * from './group.repository';
 export * from './grade.repository';
+export * from './faculty.repository';

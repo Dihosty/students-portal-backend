@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   ForbiddenException,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -47,6 +48,10 @@ export class GradeController {
         throw new ForbiddenException('Teacher profile not found for this user');
       }
       createGradeDto.teacherId = teacher.id!;
+    } else if (user.role === UserRole.ADMIN) {
+      if (!createGradeDto.teacherId) {
+        throw new BadRequestException('teacherId is required for ADMIN');
+      }
     }
     return this.gradeService.create(createGradeDto);
   }

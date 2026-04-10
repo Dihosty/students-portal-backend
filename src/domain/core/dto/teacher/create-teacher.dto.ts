@@ -1,20 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsUUID } from 'class-validator';
 
 export class CreateTeacherDto {
   @ApiProperty({
     description: 'User ID (must be a user with TEACHER role)',
-    example: '123e4567-e89b-12d3-a456-426614174000',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
   })
   @IsNotEmpty()
   @IsUUID()
   userId: string;
 
   @ApiProperty({
-    description: 'Faculty name',
-    example: 'Software Engineering',
+    description: 'Faculty ID',
+    example: '02ed4391-d8e6-480a-8502-b027434641a0',
   })
   @IsNotEmpty()
-  @IsString()
-  faculty: string;
+  @IsUUID()
+  facultyId: string;
 }
