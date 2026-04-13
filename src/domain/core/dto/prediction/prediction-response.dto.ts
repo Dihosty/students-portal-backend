@@ -156,6 +156,9 @@ export class RiskStudentDto {
     example: '123e4567-e89b-12d3-a456-426614174222',
   })
   facultyId?: string;
+
+  @ApiProperty({ required: false, example: 'Faculty of Informatics' })
+  facultyName?: string;
 }
 
 export class RiskStudentsResponseDto {

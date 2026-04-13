@@ -1,4 +1,6 @@
 import { GradeService } from '@application/services/grade/grade.service';
+import { FacultyService } from '@application/services/faculty/faculty.service';
+import { GroupService } from '@application/services/group/group.service';
 import { UserService } from '@application/services/user/user.service';
 import {
   AnalyticsDynamicsDto,
@@ -26,6 +28,8 @@ export class PredictionService {
   constructor(
     private readonly gradeService: GradeService,
     private readonly userService: UserService,
+    private readonly groupService: GroupService,
+    private readonly facultyService: FacultyService,
   ) {}
 
   async predictStudent(
@@ -124,7 +128,14 @@ export class PredictionService {
 
   async listRiskStudents(): Promise<RiskStudentsResponseDto> {
     const students = await this.userService.findStudents();
+    const groups = await this.groupService.findAll();
+    const faculties = await this.facultyService.findAll();
     const allGrades = await this.gradeService.findAll();
+
+    const groupById = new Map(groups.map((group) => [group.id!, group]));
+    const facultyById = new Map(
+      faculties.map((faculty) => [faculty.id!, faculty]),
+    );
 
     const gradesByStudent = new Map<string, Grade[]>();
     for (const grade of allGrades) {
@@ -146,6 +157,16 @@ export class PredictionService {
         continue;
       }
 
+      const resolvedFacultyId = this.resolveFacultyId(
+        student.facultyId,
+        student.groupId,
+        groupById,
+        facultyById,
+      );
+      const facultyName = resolvedFacultyId
+        ? facultyById.get(resolvedFacultyId)?.name
+        : undefined;
+
       riskyStudents.push({
         studentId: student.id,
         fullName: student.fullName,
@@ -153,7 +174,8 @@ export class PredictionService {
         confidence: prediction.confidence,
         riskLevel: prediction.riskLevel,
         groupId: student.groupId,
-        facultyId: student.facultyId,
+        facultyId: resolvedFacultyId,
+        facultyName,
       });
     }
 
@@ -423,5 +445,27 @@ export class PredictionService {
       return 1;
     }
     return 0;
+  }
+
+  private resolveFacultyId(
+    facultyId: string | undefined,
+    groupId: string | undefined,
+    groupById: Map<string, { facultyId?: string }>,
+    facultyById: Map<string, { id?: string; name: string }>,
+  ): string | undefined {
+    if (facultyId && facultyById.has(facultyId)) {
+      return facultyId;
+    }
+
+    if (!groupId) {
+      return undefined;
+    }
+
+    const groupFacultyId = groupById.get(groupId)?.facultyId;
+    if (groupFacultyId && facultyById.has(groupFacultyId)) {
+      return groupFacultyId;
+    }
+
+    return undefined;
   }
 }
