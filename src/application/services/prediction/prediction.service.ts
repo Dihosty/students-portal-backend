@@ -23,6 +23,13 @@ const GRADE_TYPE_WEIGHTS: Record<GradeType, number> = {
   [GradeType.PRACTICE]: 0.6,
 };
 
+const PREDICTION_WEIGHTS = {
+  recent: 0.7,
+  historical: 0.3,
+  trendScale: 10,
+  trendImpact: 1,
+} as const;
+
 @Injectable()
 export class PredictionService {
   constructor(
@@ -60,7 +67,9 @@ export class PredictionService {
     const trend = this.round(this.calcTrend(weightedScores));
 
     const predictedRaw =
-      0.6 * weightedAvgRecent + 0.3 * weightedAvgAll + 0.1 * trend;
+      PREDICTION_WEIGHTS.recent * weightedAvgRecent +
+      PREDICTION_WEIGHTS.historical * weightedAvgAll +
+      trend * PREDICTION_WEIGHTS.trendImpact;
     const predictedFinalScore = this.round(this.clamp(predictedRaw, 0, 100));
     const confidence = this.calcConfidence(sortedGrades.length);
     const riskLevel = this.classifyRisk(predictedFinalScore);
@@ -377,9 +386,17 @@ export class PredictionService {
     const weightedAvgAll = this.calcWeightedAverage(sortedGrades);
     const weightedAvgRecent = this.calcWeightedAverage(sortedGrades.slice(-5));
     const trend = this.calcTrend(this.extractWeightedScores(sortedGrades));
+    const normalizedTrend =
+      this.clamp(
+        trend,
+        -PREDICTION_WEIGHTS.trendScale,
+        PREDICTION_WEIGHTS.trendScale,
+      ) / PREDICTION_WEIGHTS.trendScale;
 
     const predictedRaw =
-      0.6 * weightedAvgRecent + 0.3 * weightedAvgAll + 0.1 * trend;
+      PREDICTION_WEIGHTS.recent * weightedAvgRecent +
+      PREDICTION_WEIGHTS.historical * weightedAvgAll +
+      normalizedTrend * PREDICTION_WEIGHTS.trendImpact;
     const predictedFinalScore = this.round(this.clamp(predictedRaw, 0, 100));
 
     return {
