@@ -22,6 +22,7 @@ import {
 import { GradeService } from '@application/services';
 import { TeacherService } from '@application/services';
 import { CreateGradeDto, UpdateGradeDto } from '@domain/core';
+import type { AuthenticatedUser } from '@domain/core';
 import { Roles, CurrentUser } from '@presentation/decorators';
 import { UserRole } from '@domain/core/enums';
 
@@ -40,7 +41,7 @@ export class GradeController {
   @ApiResponse({ status: 201, description: 'Grade added successfully' })
   async create(
     @Body() createGradeDto: CreateGradeDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
   ) {
     if (user.role === UserRole.TEACHER) {
       const teacher = await this.teacherService.findByUserId(user.id);
@@ -68,7 +69,7 @@ export class GradeController {
   @Roles(UserRole.STUDENT)
   @ApiOperation({ summary: 'Get my grades (Student only)' })
   @ApiResponse({ status: 200, description: 'List of student grades' })
-  async getMyGrades(@CurrentUser() user: any) {
+  async getMyGrades(@CurrentUser() user: AuthenticatedUser) {
     return this.gradeService.findByStudentId(user.id);
   }
 

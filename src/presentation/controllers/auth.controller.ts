@@ -5,6 +5,7 @@ import {
   UserProfileDto,
   ChangePasswordDto,
 } from '@domain/core';
+import type { AuthenticatedUser } from '@domain/core';
 import {
   Controller,
   Post,
@@ -47,7 +48,9 @@ export class AuthController {
     description: 'User profile retrieved successfully',
     type: UserProfileDto,
   })
-  async getProfile(@CurrentUser() user: any): Promise<UserProfileDto> {
+  async getProfile(
+    @CurrentUser() user: AuthenticatedUser,
+  ): Promise<UserProfileDto> {
     return this.authService.getProfile(user.id);
   }
 
@@ -60,7 +63,7 @@ export class AuthController {
     description: 'Password successfully changed',
   })
   async changePassword(
-    @CurrentUser() user: any,
+    @CurrentUser() user: AuthenticatedUser,
     @Body() changePasswordDto: ChangePasswordDto,
   ): Promise<{ message: string }> {
     return this.authService.changePassword(user.id, changePasswordDto);
